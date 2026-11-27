@@ -1,0 +1,18 @@
+# בונה את הקורס ומפרסם אותו ב-GitHub Pages בכל push ל-main. כל העבודה נעשית
+# בתהליך המשותף שבריפו הבסיס.
+# הפעלה חד-פעמית: Settings → Pages → Build and deployment → Source: GitHub Actions.
+name: Build and deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  site:
+    uses: mta-notes/quartz-hebrew/.github/workflows/build-course.yml@main
