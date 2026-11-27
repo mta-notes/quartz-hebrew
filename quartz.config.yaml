@@ -1,0 +1,214 @@
+# yaml-language-server: $schema=./quartz/plugins/quartz-plugins.schema.json
+#
+# הגדרות Quartz 5 של האתר. scripts/assemble.mjs מעתיק את הקובץ הזה לתיקיית
+# quartz/ לפני כל בנייה, אז משנים רק כאן.
+#
+# מה שונה מברירת המחדל של Quartz:
+# - locale: he-IL. Quartz כותב <html lang="he" dir="rtl">, וכל הטקסטים שלו
+#   (חיפוש, הערות, מצב כהה) בעברית. theme/custom.scss מתאים את העיצוב לימין-לשמאל.
+# - גופנים: Heebo לעברית ולאנגלית ו-JetBrains Mono לקוד, מוגשים מהאתר עצמו
+#   (theme/static/fonts), כך שאף מבקר לא פונה ל-Google.
+# - הרכיבים של האתר (theme/site.ts): רשימת הפרקים במקום הסייר, כותרת עמוד משלו,
+#   תוכן עניינים שמסמן את הסעיף הנקרא, ניווט לפרק הקודם והבא, ופוטר משלו.
+# - תמונת השיתוף (og-image) כבויה: Satori, שמצייר אותה, לא תומך בכתב מימין לשמאל
+#   והיה מצייר את העברית הפוכה.
+configuration:
+  pageTitle: Quartz בעברית
+  pageTitleSuffix: " | Quartz בעברית"
+  enableSPA: true
+  enablePopovers: true
+  prefetch: viewport
+  analytics: null
+  locale: he-IL
+  # הכתובת שבה האתר יפורסם, בלי https://. ב-GitHub Pages: <משתמש>.github.io/<ריפו>
+  baseUrl: mta-notes.github.io/quartz-hebrew
+  ignorePatterns:
+    - private
+    - templates
+    - .obsidian
+  theme:
+    cdnCaching: false
+    typography:
+      header:
+        name: Heebo
+        weights: [500, 700, 800]
+      body:
+        name: Heebo
+        weights: [400, 500, 700]
+      code:
+        name: JetBrains Mono
+        weights: [400]
+    # כל צבע טקסט עובר WCAG AA (4.5:1) על הרקע שלו, בשני המצבים.
+    colors:
+      lightMode:
+        light: "#fbfbfe"
+        lightgray: "#e3e4f0"
+        gray: "#676a80"
+        darkgray: "#363848"
+        dark: "#1b1c28"
+        secondary: "#4c45c9"
+        tertiary: "#352ea3"
+        highlight: rgba(76, 69, 201, 0.09)
+        textHighlight: "#ffe27a99"
+      darkMode:
+        light: "#15161c"
+        lightgray: "#2b2d38"
+        gray: "#9799aa"
+        darkgray: "#d9dae4"
+        dark: "#f1f1f6"
+        secondary: "#a7a3ff"
+        tertiary: "#c9c6ff"
+        highlight: rgba(167, 163, 255, 0.12)
+        textHighlight: "#8a7a1a99"
+  fonts:
+    fontOrigin: local
+  links:
+    markdownLinkResolution: shortest
+  contentIndex:
+    enableSiteMap: true
+    enableRSS: true
+plugins:
+  - source: "@quartz-community/created-modified-date"
+    enabled: true
+    options:
+      defaultDateType: modified
+      priority:
+        - frontmatter
+        - git
+        - filesystem
+    order: 10
+  - source: "@quartz-community/syntax-highlighting"
+    enabled: true
+    options:
+      theme:
+        light: github-light
+        dark: github-dark
+      keepBackground: false
+    order: 20
+  - source: "@quartz-community/github-flavored-markdown"
+    enabled: true
+    options:
+      # מירכאות "חכמות" באנגלית (“ ”) לא מתאימות לעברית: נשארים עם " רגילות.
+      enableSmartyPants: false
+    order: 30
+  - source: "@quartz-community/obsidian-flavored-markdown"
+    enabled: true
+    options:
+      enableInHtmlEmbed: false
+    order: 40
+  # רק קריאת הכותרות משמשת: את הרשימה עצמה מצייר theme/components/TableOfContents.tsx.
+  - source: "@quartz-community/table-of-contents"
+    enabled: true
+    order: 50
+  - source: "@quartz-community/description"
+    enabled: true
+    order: 70
+  - source: "@quartz-community/latex"
+    enabled: true
+    options:
+      renderEngine: katex
+    order: 80
+  - source: "@quartz-community/alias-redirects"
+    enabled: true
+  - source: "@quartz-community/favicon"
+    enabled: true
+  # כבוי: Satori לא תומך בעברית מימין לשמאל (ראו למעלה).
+  - source: "@quartz-community/og-image"
+    enabled: false
+  - source: "@quartz-community/cname"
+    enabled: false
+  - source: "@quartz-community/content-page"
+    enabled: true
+  - source: "@quartz-community/folder-page"
+    enabled: true
+  - source: "@quartz-community/tag-page"
+    enabled: true
+  # במקומו: רשימת הפרקים ב-theme/components/ChapterNav.tsx.
+  - source: "@quartz-community/explorer"
+    enabled: false
+    layout:
+      position: left
+      priority: 50
+  - source: "@quartz-community/graph"
+    enabled: true
+    layout:
+      position: right
+      priority: 40
+  - source: "@quartz-community/search"
+    enabled: true
+    layout:
+      position: left
+      priority: 20
+      group: toolbar
+      groupOptions:
+        grow: true
+  - source: "@quartz-community/backlinks"
+    enabled: false
+    layout:
+      position: right
+      priority: 50
+  # כבויים: theme/components/PageHeader.tsx מצייר את ראש כל עמוד.
+  - source: "@quartz-community/article-title"
+    enabled: false
+  - source: "@quartz-community/content-meta"
+    enabled: false
+  - source: "@quartz-community/breadcrumbs"
+    enabled: false
+  - source: "@quartz-community/tag-list"
+    enabled: true
+    layout:
+      position: beforeBody
+      priority: 30
+      condition: not-index
+  - source: "@quartz-community/page-title"
+    enabled: true
+    layout:
+      position: left
+      priority: 10
+  # בתוך הפוטר: theme/components/SiteFooter.tsx מצייר כפתור משלו ומשתמש בסקריפט של Quartz.
+  - source: "@quartz-community/darkmode"
+    enabled: true
+    layout:
+      position: footer
+      priority: 40
+  - source: "@quartz-community/reader-mode"
+    enabled: false
+  - source: "@quartz-community/comments"
+    enabled: false
+    options:
+      provider: giscus
+      options: {}
+  - source: "@quartz-community/footer"
+    enabled: false
+  - source: "@quartz-community/recent-notes"
+    enabled: false
+  - source: "@quartz-community/spacer"
+    enabled: true
+    options: {}
+    layout:
+      position: left
+      priority: 25
+      display: mobile-only
+  - source: "@quartz-community/unlisted-pages"
+    enabled: true
+    options: {}
+    order: 45
+layout:
+  sidebars:
+    left: scroll
+    right: fit
+  groups:
+    toolbar:
+      priority: 35
+      direction: row
+      gap: 0.5rem
+  byPageType:
+    "404":
+      positions:
+        beforeBody: []
+        left: []
+        right: []
+    content: {}
+    folder:
+      positions:
+        right: []

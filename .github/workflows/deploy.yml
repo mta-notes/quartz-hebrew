@@ -1,0 +1,49 @@
+# בונה את האתר ומפרסם אותו ב-GitHub Pages בכל push ל-main.
+# הפעלה חד-פעמית: Settings → Pages → Build and deployment → Source: GitHub Actions.
+name: Build and deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # כל ההיסטוריה, כדי ש"עודכן ב..." יהיה תאריך השינוי האחרון ב-Git.
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Cache Quartz
+        uses: actions/cache@v4
+        with:
+          path: quartz
+          key: quartz-${{ hashFiles('quartz-version.txt') }}
+      - name: Build
+        run: ./build.sh
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

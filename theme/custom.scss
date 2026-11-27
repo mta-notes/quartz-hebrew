@@ -1,0 +1,1962 @@
+@use "./variables.scss" as *;
+
+// העיצוב של האתר. scripts/assemble.mjs מעתיק את הקובץ הזה מעל
+// quartz/styles/custom.scss, ש-Quartz טוען אחרי הסגנונות שלו, ולכן הכללים כאן
+// גוברים.
+//
+// כיוון: העמוד כולו dir="rtl" (Quartz כותב אותו לפי locale: he-IL). לכן כל
+// הכללים כאן משתמשים במאפיינים לוגיים (margin-inline-start, inset-inline-end,
+// border-inline-start…) ולא ב-left/right. "start" הוא ימין בעברית ושמאל
+// באנגלית, כך שאותו קובץ עובד גם אם תחליפו לשפה משמאל לימין. במקומות שבהם
+// Quartz או התוספים שלו כתבו left/right, יש כאן תיקון מפורש (מסומן "RTL:").
+//
+// הצבעים באים מ-quartz.config.yaml (--light, --dark, --secondary…). מצב כהה
+// מסומן ב-:root[saved-theme="dark"].
+
+// ---------------------------------------------------------------- גופנים
+
+// Heebo (קובץ משתנה אחד לכל המשקלים) ו-JetBrains Mono, מוגשים מהאתר ומחולקים
+// לפי אלפבית: הדפדפן מוריד רק את החלקים שהעמוד משתמש בהם, ואף בקשה לא יוצאת ל-Google.
+// שניהם ברישיון SIL Open Font License; הרישיונות ליד הקבצים.
+@font-face {
+  font-family: "Heebo";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url("static/fonts/heebo-hebrew-wght-normal.woff2") format("woff2-variations");
+  unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;
+}
+@font-face {
+  font-family: "Heebo";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url("static/fonts/heebo-latin-ext-wght-normal.woff2") format("woff2-variations");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Heebo";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url("static/fonts/heebo-latin-wght-normal.woff2") format("woff2-variations");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+// רק האותיות העבריות של Heebo, בשם נפרד: הוא בא מיד אחרי JetBrains Mono
+// ב---codeFont, כך שבקוד האותיות הלטיניות ב-JetBrains Mono והעבריות ב-Heebo
+// (ולא בגופן מערכת מקרי). גם תרשימי Mermaid משתמשים ב---codeFont.
+@font-face {
+  font-family: "Heebo Hebrew";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url("static/fonts/heebo-hebrew-wght-normal.woff2") format("woff2-variations");
+  unicode-range: U+0590-05FF, U+FB1D-FB4F;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 800;
+  src: url("static/fonts/jetbrains-mono-latin-ext-wght-normal.woff2") format("woff2-variations");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 800;
+  src: url("static/fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2-variations");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+// ---------------------------------------------------------------- משתנים
+
+:root {
+  // אם הגופן עוד לא נטען, גופן מערכת עברי טוב.
+  --bodyFont: "Heebo", "Segoe UI", "Arial Hebrew", "Noto Sans Hebrew", system-ui, sans-serif;
+  --headerFont: "Heebo", "Segoe UI", "Arial Hebrew", "Noto Sans Hebrew", system-ui, sans-serif;
+  // עברית בתוך קוד (הערות, מחרוזות, תוויות בתרשים) נכתבת ב-Heebo.
+  --codeFont: "JetBrains Mono", "Heebo Hebrew", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --hd-radius: 10px;
+  --hd-radius-small: 6px;
+  --hd-reading: 42rem;
+  --hd-ease: cubic-bezier(0.2, 0, 0, 1);
+  --hd-shadow: 0 1px 2px rgb(27 28 40 / 0.06), 0 4px 16px rgb(27 28 40 / 0.06);
+  --hd-shadow-hover: 0 2px 4px rgb(27 28 40 / 0.08), 0 10px 28px rgb(27 28 40 / 0.1);
+  --hd-button-text: #ffffff;
+  --hd-surface: #ffffff;
+  --hd-band-from: #efeefe;
+  --hd-band-to: #f7f6ff;
+  --hd-band-number: rgb(76 69 201 / 0.13);
+
+  // צבעי ההערות (callouts), "r, g, b", וגוון כהה מספיק לטקסט (4.5:1).
+  --hd-red: 220, 53, 69;
+  --hd-red-text: #b8293a;
+  --hd-orange: 232, 121, 18;
+  --hd-orange-text: #a65400;
+  --hd-yellow: 214, 165, 0;
+  --hd-yellow-text: #7f6200;
+  --hd-green: 22, 163, 74;
+  --hd-green-text: #0f7a37;
+  --hd-cyan: 8, 145, 178;
+  --hd-cyan-text: #0a6f88;
+  --hd-blue: 37, 99, 235;
+  --hd-blue-text: #1d4fc4;
+  --hd-purple: 124, 82, 230;
+  --hd-purple-text: #6a3fd6;
+  --hd-gray: 120, 120, 135;
+  --hd-gray-text: #5e5e6e;
+}
+
+:root[saved-theme="dark"] {
+  --hd-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 4px 16px rgb(0 0 0 / 0.25);
+  --hd-shadow-hover: 0 2px 4px rgb(0 0 0 / 0.35), 0 10px 28px rgb(0 0 0 / 0.35);
+  --hd-button-text: #15161c;
+  --hd-surface: #1c1d25;
+  --hd-band-from: #22213a;
+  --hd-band-to: #1b1b28;
+  --hd-band-number: rgb(167 163 255 / 0.14);
+
+  --hd-red: 248, 81, 99;
+  --hd-red-text: #ff7b8a;
+  --hd-orange: 240, 150, 60;
+  --hd-orange-text: #f5a65b;
+  --hd-yellow: 230, 200, 80;
+  --hd-yellow-text: #e8cf6a;
+  --hd-green: 70, 200, 115;
+  --hd-green-text: #5fd68a;
+  --hd-cyan: 60, 200, 220;
+  --hd-cyan-text: #62d3e6;
+  --hd-blue: 90, 150, 255;
+  --hd-blue-text: #7fb0ff;
+  --hd-purple: 170, 140, 255;
+  --hd-purple-text: #b9a3ff;
+  --hd-gray: 160, 160, 175;
+  --hd-gray-text: #b4b4c2;
+}
+
+// ---------------------------------------------------------------- בסיס
+
+:where(a, button, summary, input, [tabindex]):focus-visible {
+  outline: 2px solid var(--secondary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+html {
+  // גלילה לעוגן (#סעיף) עוצרת מתחת לראש המסך ולא צמוד אליו.
+  scroll-padding-top: 1.5rem;
+}
+
+body {
+  // עברית נקראת טוב יותר בגודל מעט גדול ובמרווח שורות רחב יותר מאנגלית:
+  // לאותיות אין עולים ויורדים רבים, והניקוד (כשיש) צריך מקום.
+  font-size: 1.0625rem;
+  font-feature-settings: "kern" 1;
+  font-kerning: normal;
+}
+
+// "דילוג לתוכן": מחוץ למסך עד שמגיעים אליו ב-Tab.
+.hd-skip {
+  position: absolute;
+  inset-inline-start: 1rem;
+  top: -4rem;
+  z-index: 10000;
+  padding: 0.6rem 1rem;
+  border-radius: var(--hd-radius-small);
+  background: var(--secondary);
+  color: var(--hd-button-text) !important;
+  font-weight: 600;
+  &:focus {
+    top: 1rem;
+  }
+}
+
+.page > #quartz-body {
+  & .center {
+    @media all and not ($mobile) {
+      max-width: var(--hd-reading);
+      min-width: 0;
+      width: 100%;
+      margin-inline: auto;
+    }
+  }
+  // RTL: Quartz מצמיד את העמודה לצד ימין בטאבלט (margin-right: 0); כאן היא באמצע.
+  @media all and ($tablet) {
+    & .center,
+    & footer {
+      margin-inline: auto;
+    }
+  }
+  @media all and not ($desktop) {
+    padding-inline: clamp(1rem, 4vw, 3rem);
+  }
+}
+
+article {
+  line-height: 1.8;
+
+  & > * + h2 {
+    margin-top: 3rem;
+  }
+  & h2,
+  & h3,
+  & h4 {
+    text-wrap: balance;
+    line-height: 1.35;
+  }
+  & h2 {
+    font-size: 1.55rem;
+    font-weight: 700;
+    padding-top: 0.25rem;
+  }
+  & h3 {
+    font-size: 1.22rem;
+    font-weight: 700;
+    margin-top: 2rem;
+  }
+  & p,
+  & li {
+    text-wrap: pretty;
+  }
+  & img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 1.5rem auto;
+    border-radius: var(--hd-radius);
+  }
+  // RTL: רשימות. הדפדפן כבר שם את התבליט מימין (padding-inline-start), אבל
+  // כמה כללים של Quartz כתבו padding-left.
+  & li:has(> input[type="checkbox"]) {
+    padding-inline-start: 0;
+  }
+  & ul,
+  & ol {
+    padding-inline-start: 1.6rem;
+    padding-inline-end: 0;
+  }
+  & li::marker {
+    color: var(--gray);
+  }
+  & ol > li::marker {
+    font-variant-numeric: tabular-nums;
+  }
+}
+.transclude ul {
+  padding-left: 0;
+  padding-inline-start: 1rem;
+}
+
+// כל הטקסט מיושר לימין, גם שורה שמתחילה באנגלית (כמו force-rtl-text.css).
+// פסקה שאין בה עברית בכלל מקבלת dir="ltr" (theme/transforms/bidiDirection.ts)
+// כדי שהנקודה בסוף המשפט תהיה במקומה, אבל נשארת מיושרת לימין כמו כל העמוד.
+article :is(p, h1, h2, h3, h4, h5, h6, td, th, dt, dd, figcaption, summary)[dir="ltr"] {
+  text-align: right;
+}
+
+// כותרות: קישור ה-# של Quartz עובר לצד השמאלי (סוף השורה) ולא דוחף את הכותרת.
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  &[id] > a[href^="#"] {
+    margin: 0;
+    margin-inline-start: 0.4rem;
+    color: var(--gray);
+    font-size: 0.85em;
+  }
+}
+
+// ---------------------------------------------------------------- ראש העמוד
+
+// מצויר ב-theme/components/PageHeader.tsx: פס צבעוני ובו שם הקבוצה, הכותרת וזמן
+// הקריאה. מספר הפרק גדול וחיוור בקצה הפס (שמאל, ב-RTL).
+.hd-page-head {
+  margin-top: 0.5rem;
+  outline: none;
+}
+
+.hd-band {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.6rem 1.75rem 1.4rem;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--secondary) 18%, var(--lightgray));
+  background: linear-gradient(to left, var(--hd-band-from), var(--hd-band-to));
+  // RTL: ההדרגה מתחילה בצד ימין, שם הטקסט מתחיל.
+  [dir="ltr"] & {
+    background: linear-gradient(to right, var(--hd-band-from), var(--hd-band-to));
+  }
+  &.hd-band-plain {
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+}
+
+.hd-band-text {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.hd-band-eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--secondary);
+}
+
+.hd-band-number {
+  position: absolute;
+  inset-inline-end: 1.25rem;
+  top: 50%;
+  translate: 0 -50%;
+  font: 800 6.5rem/1 var(--headerFont);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+  color: var(--hd-band-number);
+  pointer-events: none;
+  user-select: none;
+  @media all and ($mobile) {
+    font-size: 4.5rem;
+    inset-inline-end: 0.75rem;
+  }
+}
+
+.page article > h1,
+.article-title {
+  font-size: clamp(1.9rem, 4vw, 2.5rem);
+  font-weight: 800;
+  line-height: 1.2;
+  text-wrap: balance;
+  margin: 0;
+  color: var(--dark);
+}
+
+.hd-page-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.9rem 0 0;
+}
+
+.hd-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--secondary) 16%, var(--lightgray));
+  background: var(--hd-surface);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--gray);
+  & time {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  & svg {
+    width: 0.9rem;
+    height: 0.9rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+a.hd-chip {
+  transition:
+    color 0.15s var(--hd-ease),
+    border-color 0.15s var(--hd-ease);
+  &:hover {
+    color: var(--secondary);
+    border-color: var(--secondary);
+  }
+}
+
+// "בעמוד הזה": רק ברוחבים שאין בהם עמודת תוכן עניינים.
+.hd-onpage {
+  margin-top: 1rem;
+  border: 1px solid var(--lightgray);
+  border-radius: var(--hd-radius);
+  background: var(--hd-surface);
+  @media all and ($desktop) {
+    display: none;
+  }
+  & > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 44px;
+    padding: 0 1rem;
+    cursor: pointer;
+    font-weight: 600;
+    list-style: none;
+    &::-webkit-details-marker {
+      display: none;
+    }
+    &::after {
+      content: "";
+      width: 1rem;
+      height: 1rem;
+      background-color: var(--gray);
+      mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>')
+        no-repeat center / contain;
+      transition: rotate 0.2s var(--hd-ease);
+    }
+  }
+  &[open] > summary::after {
+    rotate: 180deg;
+  }
+  & ul {
+    list-style: none;
+    margin: 0;
+    padding: 0 1rem 0.75rem;
+  }
+  & li {
+    margin: 0;
+    @for $depth from 2 through 5 {
+      &.depth-#{$depth} {
+        padding-inline-start: #{($depth - 1)}rem;
+      }
+    }
+  }
+  & a {
+    display: block;
+    padding: 0.35rem 0;
+    color: var(--darkgray);
+    font-weight: 400;
+  }
+}
+
+// תגיות מתחת לראש העמוד.
+.page-header .tags {
+  margin-top: 0.9rem;
+  padding: 0;
+  gap: 0.4rem;
+}
+
+// ---------------------------------------------------------------- שם האתר
+
+.page-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin: 0;
+  & a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--dark);
+    // הלוגו: אות א' באריח, מ-theme/static/logo.svg.
+    &::before {
+      content: "";
+      flex: none;
+      width: 2rem;
+      height: 2rem;
+      background: url("static/logo.svg") center / contain no-repeat;
+    }
+  }
+}
+
+// ---------------------------------------------------------------- חיפוש
+
+.search > .search-button {
+  height: 2.5rem;
+  // RTL: Quartz נותן padding רק מימין, ובעברית שם נמצא האייקון.
+  padding: 0;
+  padding-inline-end: 0.5rem;
+  border-radius: var(--hd-radius-small);
+  border: 1px solid var(--lightgray);
+  background: var(--hd-surface);
+  color: var(--gray);
+  transition: border-color 0.15s var(--hd-ease);
+  & > p {
+    color: var(--gray);
+  }
+  &:hover {
+    border-color: color-mix(in srgb, var(--secondary) 45%, var(--lightgray));
+  }
+  // קיצור המקשים, כפי שהמחשב הזה כותב אותו. תמיד משמאל לימין.
+  &::after {
+    content: "Ctrl K";
+    direction: ltr;
+    margin-inline-start: auto;
+    padding: 0.05rem 0.4rem;
+    border: 1px solid var(--lightgray);
+    border-radius: 4px;
+    font: 0.75rem/1.4 var(--codeFont);
+    color: var(--gray);
+    white-space: nowrap;
+  }
+  :root[data-hd-platform="apple"] &::after {
+    content: "⌘K";
+  }
+  @media (hover: none) {
+    &::after {
+      display: none;
+    }
+  }
+}
+
+// RTL: תוצאות החיפוש. Quartz שם את הקו בין הרשימה לתצוגה המקדימה בצד ימין.
+.search > .search-container > .search-space {
+  & > input {
+    text-align: start;
+    font-family: var(--bodyFont);
+  }
+  & .result-card {
+    text-align: start !important;
+  }
+  & .result-card > ul.tags > li {
+    margin-right: 0 !important;
+    margin-inline-end: 0.3rem;
+  }
+  @media all and not ($mobile) {
+    & > .search-layout[data-preview] > div:first-child {
+      border-right: 0 !important;
+      border-inline-end: 1px solid var(--lightgray);
+      border-radius: 0;
+      border-start-start-radius: 7px;
+      border-end-start-radius: 7px;
+    }
+    & > .search-layout[data-preview] > div:last-child {
+      border-radius: 0;
+      border-start-end-radius: 7px;
+      border-end-end-radius: 7px;
+    }
+  }
+}
+
+// מעל רוחב טלפון לתיבת החיפוש יש שורה משלה מתחת לשם האתר.
+@media all and not ($mobile) {
+  .page > #quartz-body .sidebar.left {
+    & > .flex-component {
+      width: 100%;
+      & .search {
+        max-width: none;
+        width: 100%;
+      }
+    }
+  }
+}
+
+// ---------------------------------------------------------------- רשימת הפרקים
+
+.hd-chapters {
+  display: contents;
+}
+
+.hd-nav {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.95rem;
+
+  & ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  & .hd-nav-group {
+    padding-block: 0.9rem;
+    &:first-child {
+      padding-top: 0;
+    }
+    &:last-child {
+      padding-bottom: 0;
+    }
+    & + .hd-nav-group {
+      border-top: 1px solid var(--lightgray);
+    }
+
+    // פתיחה וסגירה מחליקות במקום לקפוץ (::details-content כרשת של שורה אחת,
+    // שעוברת בין 1fr ל-0fr). דפדפן בלי ::details-content פשוט פותח וסוגר.
+    &::details-content {
+      content-visibility: visible;
+      display: grid;
+      grid-template-rows: 1fr;
+    }
+    &:not([open])::details-content {
+      grid-template-rows: 0fr;
+    }
+    & > ul {
+      min-height: 0;
+      overflow: hidden;
+      margin: -4px;
+      padding: 4px;
+    }
+    &:not([open]) > ul {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    &:not([data-settling]) .hd-nav-group {
+      &::details-content {
+        transition: grid-template-rows 0.3s var(--hd-ease);
+      }
+      & > ul {
+        transition:
+          opacity 0.25s var(--hd-ease),
+          visibility 0s;
+      }
+      &:not([open]) > ul {
+        transition:
+          opacity 0.25s var(--hd-ease),
+          visibility 0s linear 0.3s;
+      }
+      & > summary::after {
+        transition:
+          rotate 0.3s var(--hd-ease),
+          opacity 0.15s var(--hd-ease);
+      }
+    }
+  }
+
+  & a {
+    display: flex;
+    gap: 0.6rem;
+    align-items: baseline;
+    padding: 0.32rem 0.6rem;
+    border-radius: var(--hd-radius-small);
+    color: var(--darkgray);
+    font-weight: 400;
+    line-height: 1.4;
+    transition:
+      background-color 0.15s var(--hd-ease),
+      color 0.15s var(--hd-ease);
+    &:hover {
+      background-color: var(--highlight);
+      color: var(--dark);
+    }
+    &[aria-current="page"] {
+      background-color: var(--highlight);
+      color: var(--secondary);
+      font-weight: 600;
+      // פס דק בצד ההתחלה (ימין) מסמן את העמוד הנוכחי.
+      box-shadow: inset -3px 0 0 var(--secondary);
+      [dir="ltr"] & {
+        box-shadow: inset 3px 0 0 var(--secondary);
+      }
+      & .hd-nav-number {
+        color: var(--secondary);
+      }
+    }
+  }
+  & .hd-nav-number {
+    flex: none;
+    min-width: 1.4rem;
+    font: 0.75rem/1 var(--codeFont);
+    color: var(--gray);
+    font-variant-numeric: tabular-nums;
+  }
+
+  // כותרת הקבוצה. בעברית אין אותיות גדולות, ולכן היא מודגשת ולא UPPERCASE עם
+  // ריווח אותיות (שמפרק מילים עבריות). חץ הקיפול מופיע במעבר עכבר: מצביע
+  // שמאלה (לכיוון הקריאה) כשהקבוצה סגורה, ולמטה כשהיא פתוחה.
+  & summary {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.6rem 0.45rem;
+    border-radius: var(--hd-radius-small);
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--dark);
+    &::-webkit-details-marker {
+      display: none;
+    }
+    &::after {
+      content: "";
+      flex: none;
+      width: 0.9em;
+      height: 0.9em;
+      background-color: currentColor;
+      mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>')
+        no-repeat center / contain;
+      rotate: 90deg;
+      opacity: 0;
+      [dir="ltr"] & {
+        rotate: -90deg;
+      }
+    }
+    &:hover,
+    &:focus-visible {
+      &::after {
+        opacity: 1;
+      }
+    }
+    &:hover {
+      color: var(--secondary);
+    }
+    @media (hover: none) {
+      &::after {
+        opacity: 1;
+      }
+    }
+  }
+  & details[open] > summary::after {
+    rotate: 0deg;
+  }
+}
+
+.hd-nav-sidebar {
+  @media all and ($mobile) {
+    display: none;
+  }
+  padding-bottom: 2rem;
+}
+
+.hd-menu-button {
+  display: none;
+  @media all and ($mobile) {
+    display: inline-grid;
+    place-items: center;
+    order: -1;
+    flex: none;
+    width: 44px;
+    height: 44px;
+    margin-inline-end: 0.25rem;
+    padding: 0;
+    border: 0;
+    border-radius: var(--hd-radius-small);
+    background: transparent;
+    color: var(--dark);
+    cursor: pointer;
+  }
+  & svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+}
+
+// המגירה בטלפון: <dialog> במסך מלא ובתוכו גלילה צידית. המגירה היא נקודת העצירה
+// הראשונה (פתוח), עמודה ריקה היא השנייה (סגור). ב-RTL הרשת מתהפכת מעצמה:
+// המגירה בצד ימין, והיא נכנסת ויוצאת מימין.
+.hd-drawer {
+  --hd-drawer-width: min(20rem, 85dvw, 100dvw - 24px);
+  --hd-drawer-backdrop: 0;
+  inset: 0;
+  width: auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: visible;
+  color: var(--darkgray);
+
+  &::backdrop {
+    background: #000;
+    opacity: calc(var(--hd-drawer-backdrop) / 2);
+  }
+}
+
+.hd-drawer-scroller {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--hd-drawer-width) 100%;
+  overflow-x: scroll;
+  overscroll-behavior: none;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+  @media (prefers-reduced-motion: no-preference) {
+    scroll-behavior: smooth;
+  }
+  &::after {
+    content: "";
+    scroll-snap-align: end;
+    scroll-initial-target: nearest;
+  }
+}
+
+.hd-drawer-sheet {
+  display: flex;
+  flex-direction: column;
+  height: 100svh;
+  overflow-y: auto;
+  scroll-snap-align: start;
+  scrollbar-width: none;
+  background: var(--light);
+  border-inline-end: 1px solid var(--lightgray);
+  padding: 0 0.75rem 2rem;
+  box-sizing: border-box;
+
+  & .hd-nav a {
+    min-height: 44px;
+    align-items: center;
+  }
+  & .hd-nav summary {
+    min-height: 44px;
+  }
+}
+
+.hd-drawer-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: 0.5rem;
+  padding-inline: 0.6rem 0;
+  background: var(--light);
+  font-weight: 700;
+  color: var(--dark);
+}
+
+.hd-drawer-close {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--hd-radius-small);
+  background: transparent;
+  color: var(--dark);
+  cursor: pointer;
+  & svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+}
+
+// ה-backdrop מתכהה יחד עם הגרירה. ציר inline (ולא x): ב-RTL התחלת הגלילה
+// בצד ימין, ו-inline מחשב את ההתקדמות ממנה.
+@supports (animation-timeline: scroll()) {
+  @property --hd-drawer-backdrop {
+    syntax: "<number>";
+    inherits: true;
+    initial-value: 0;
+  }
+  @keyframes hd-drawer-backdrop {
+    0% {
+      --hd-drawer-backdrop: 1;
+    }
+    100% {
+      --hd-drawer-backdrop: 0;
+    }
+  }
+  .hd-drawer {
+    timeline-scope: --hd-drawer-fade;
+    animation: hd-drawer-backdrop linear both;
+    animation-timeline: --hd-drawer-fade;
+  }
+  .hd-drawer-scroller {
+    scroll-timeline: --hd-drawer-fade inline;
+  }
+}
+
+// שורת הראש בטלפון: כפתור תפריט, שם האתר, וכפתור חיפוש, כל אחד מטרה של 44px.
+@media all and ($mobile) {
+  .page > #quartz-body .sidebar.left {
+    padding-top: 1rem;
+    gap: 0.25rem;
+  }
+  .page-title {
+    min-width: 0;
+    font-size: 1rem;
+    & a::before {
+      width: 1.8rem;
+      height: 1.8rem;
+    }
+  }
+  .search > .search-button {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    justify-content: center;
+    & > p,
+    &::after {
+      display: none;
+    }
+  }
+}
+
+// ---------------------------------------------------------------- תוכן העניינים
+
+.toc {
+  & .toc-header {
+    margin: 0 0 0.6rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--gray);
+  }
+  & .hd-toc-body {
+    position: relative;
+  }
+  // פס התקדמות הקריאה, לאורך צד ההתחלה של הרשימה.
+  & .hd-toc-progress {
+    --hd-read: 0;
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 2px;
+    border-radius: 2px;
+    background: var(--lightgray);
+    &::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0;
+      top: 0;
+      height: calc(var(--hd-read) * 100%);
+      border-radius: inherit;
+      background: var(--secondary);
+    }
+  }
+  & .toc-content {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    padding-inline-start: 0.9rem;
+    max-height: min(22rem, 42vh);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    font-size: 0.875rem;
+    & li {
+      margin: 0.4rem 0;
+      line-height: 1.4;
+      &:first-child {
+        margin-top: 0;
+      }
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+    @for $depth from 2 through 5 {
+      & .depth-#{$depth} {
+        padding-inline-start: #{($depth - 1) * 0.9}rem;
+      }
+    }
+    & a {
+      color: var(--darkgray);
+      font-weight: 400;
+      border-radius: 4px;
+      transition: color 0.15s var(--hd-ease);
+      &:hover {
+        color: var(--secondary);
+      }
+    }
+    & a.current {
+      color: var(--secondary);
+      font-weight: 600;
+    }
+  }
+}
+
+// ---------------------------------------------------------------- קוד
+
+// קוד תמיד משמאל לימין, גם בתוך עמוד עברי: אחרת סימנים כמו ; ו-() קופצים
+// לצד הלא נכון, והשורות מיושרות לימין.
+pre,
+pre > code {
+  direction: ltr;
+  text-align: left;
+  unicode-bidi: isolate;
+}
+pre {
+  border-radius: var(--hd-radius);
+  border: 1px solid var(--lightgray);
+  background: var(--hd-surface);
+}
+// גם שם הקובץ מעל בלוק קוד (```py title="…") בצד של הקוד, משמאל.
+figure[data-rehype-pretty-code-figure] {
+  direction: ltr;
+}
+// קוד בתא של טבלה לא נשבר באמצע מילה (localho-st); טבלה רחבה מדי נגללת לצדדים.
+:is(td, th) code {
+  white-space: nowrap;
+}
+
+// קוד בתוך משפט: תמיד משמאל לימין ומבודד מהטקסט שמסביב (כמו RTL in callout.css).
+// כך `npm run dev` או `> [!tip]` בתוך משפט עברי נשארים שלמים ובסדר הנכון.
+:not(pre) > code {
+  direction: ltr;
+  unicode-bidi: isolate;
+  padding: 0.1rem 0.35rem;
+  border-radius: 5px;
+  border: 1px solid var(--lightgray);
+  background: var(--highlight);
+  font-size: 0.88em;
+}
+kbd {
+  unicode-bidi: isolate;
+  direction: ltr;
+  display: inline-block;
+  padding: 0.05rem 0.4rem;
+  border: 1px solid var(--lightgray);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  background: var(--hd-surface);
+  font: 0.8em/1.5 var(--codeFont);
+}
+
+// ---------------------------------------------------------------- נוסחאות (מ-math-rtl-fix.css)
+
+// אלגוריתם ה-bidi של הדפדפן "מראה" סוגריים בהקשר RTL: ב-$f(x)$ בתוך משפט
+// עברי הם היו מתהפכים. הפתרון: לבודד את הנוסחה מהשורה ולכפות עליה LTR.
+// Quartz מצייר נוסחאות עם KaTeX (.katex); הכללים ל-MathJax (mjx-container)
+// למקרה שתחליפו את renderEngine ב-quartz.config.yaml.
+.katex,
+.katex-display,
+.math,
+.math-inline,
+.math-block,
+mjx-container,
+mjx-math {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+// נוסחה בשורה נשארת בשורה; נוסחת בלוק במרכז.
+.katex,
+.math-inline {
+  display: inline-block;
+}
+.katex-display,
+.math-block,
+mjx-container[display="true"] {
+  display: block;
+  text-align: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+  & > .katex {
+    display: inline-block;
+  }
+}
+// עברית בתוך \text{…}: כל קטע טקסט מסדר את עצמו לפי התוכן שלו, כך שמילים
+// עבריות בתוך נוסחה לא מתהפכות.
+.katex .text {
+  unicode-bidi: plaintext;
+}
+
+// ---------------------------------------------------------------- תרשימי Mermaid (מ-RTL mermaid.css)
+
+// התוויות בתוך התרשים בעברית. התרשים עצמו (החצים, הסדר) לא מתהפך.
+// Quartz מגדיר ל-Mermaid את גופן הקוד, והרווחים בין מילים יוצאים רחבים; התוויות
+// עוברות לגופן הטקסט. Mermaid מודד את התיבות לפי גופן הקוד, הרחב יותר, אז
+// הטקסט רק נעשה צר יותר ונשאר בתוך התיבה. (!important: Mermaid כותב את
+// הגופן עם selector של id.)
+.mermaid {
+  & foreignObject :is(div, span, p),
+  & :is(.nodeLabel, .edgeLabel, .label),
+  & :is(text, tspan) {
+    direction: rtl;
+    unicode-bidi: plaintext;
+    font-family: var(--bodyFont) !important;
+  }
+}
+// Quartz שם את התרשים בתוך <pre>, שהוא LTR (למעלה). התרשים ממורכז.
+pre:has(> code.mermaid),
+pre:has(> .mermaid) {
+  text-align: center;
+  border: 0;
+  background: none;
+}
+
+// ---------------------------------------------------------------- טבלאות
+
+.table-container {
+  margin: 1.5rem 0;
+  border: 1px solid var(--lightgray);
+  border-radius: var(--hd-radius);
+  & > table {
+    margin: 0;
+    width: 100%;
+    border-collapse: collapse;
+  }
+}
+th {
+  // RTL: Quartz כותב text-align: left.
+  text-align: start;
+  background: var(--highlight);
+  border-bottom: 1px solid var(--lightgray);
+  font-weight: 700;
+}
+td,
+th {
+  padding: 0.55rem 0.9rem;
+}
+tr:not(:last-child) > td {
+  border-bottom: 1px solid var(--lightgray);
+}
+
+// ---------------------------------------------------------------- ציטוטים והערות
+
+// RTL: Quartz כותב border-left.
+blockquote,
+.transclude {
+  border-left: 0;
+  padding-left: 0;
+  border-inline-start: 3px solid var(--secondary);
+  padding-inline-start: 1rem;
+}
+
+.callout {
+  --hd-callout: var(--hd-purple);
+  --hd-callout-text: var(--hd-purple-text);
+  --color: var(--hd-callout-text);
+  --border: rgba(var(--hd-callout), 0.25);
+  --bg: rgba(var(--hd-callout), 0.07);
+  border: 1px solid var(--border);
+  border-inline-start: 4px solid rgb(var(--hd-callout));
+  border-radius: var(--hd-radius);
+  padding-inline: 1rem;
+
+  & > .callout-title {
+    gap: 0.5rem;
+  }
+  // RTL: חץ הקיפול של הערה סגורה מצביע שמאלה, לכיוון הקריאה.
+  &.is-collapsed > .callout-title > .fold-callout-icon {
+    transform: rotateZ(90deg);
+    [dir="ltr"] & {
+      transform: rotateZ(-90deg);
+    }
+  }
+}
+@each $type, $color in ("note": "blue", "abstract": "cyan", "summary": "cyan", "tldr": "cyan", "info": "blue",
+  "todo": "blue", "tip": "cyan", "hint": "cyan", "important": "cyan", "success": "green", "check": "green",
+  "done": "green", "question": "orange", "help": "orange", "faq": "orange", "warning": "orange",
+  "caution": "orange", "attention": "orange", "failure": "red", "fail": "red", "missing": "red", "danger": "red",
+  "error": "red", "bug": "red", "example": "purple", "quote": "gray", "cite": "gray")
+{
+  .callout[data-callout="#{$type}"] {
+    --hd-callout: var(--hd-#{$color});
+    --hd-callout-text: var(--hd-#{$color}-text);
+  }
+}
+
+// ---------------------------------------------------------------- כפתורים
+
+.hd-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0 1.15rem;
+  border-radius: 999px;
+  border: 1px solid var(--lightgray);
+  background: var(--hd-surface);
+  color: var(--dark) !important;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    border-color 0.15s var(--hd-ease),
+    background-color 0.15s var(--hd-ease),
+    translate 0.15s var(--hd-ease);
+  &:hover {
+    border-color: var(--secondary);
+  }
+  & svg {
+    flex: none;
+    width: 1.1rem;
+    height: 1.1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+.hd-button-primary {
+  border-color: var(--secondary);
+  background: var(--secondary);
+  color: var(--hd-button-text) !important;
+  &:hover {
+    background: var(--tertiary);
+    border-color: var(--tertiary);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    &:hover .hd-forward {
+      translate: -3px 0;
+      [dir="ltr"] & {
+        translate: 3px 0;
+      }
+    }
+  }
+  & .hd-forward {
+    transition: translate 0.15s var(--hd-ease);
+  }
+}
+
+// חצים של כיוון: מצוירים ימינה, וב-RTL מתהפכים (ראו theme/components/icons.tsx).
+[dir="rtl"] :is(.hd-forward, .hd-back) {
+  scale: -1 1;
+}
+
+// ---------------------------------------------------------------- עמוד הבית
+
+.hd-hero {
+  --hd-hero-glow: rgb(76 69 201 / 0.16);
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2rem;
+  margin-top: 0.5rem;
+  padding: 2.5rem 2rem 0;
+  border-radius: 20px;
+  border: 1px solid color-mix(in srgb, var(--secondary) 20%, var(--lightgray));
+  background:
+    radial-gradient(ellipse at 15% 0%, var(--hd-hero-glow), transparent 60%),
+    linear-gradient(to bottom, var(--hd-band-from), var(--hd-band-to));
+  outline: none;
+  :root[saved-theme="dark"] & {
+    --hd-hero-glow: rgb(167 163 255 / 0.16);
+  }
+  @media all and ($mobile) {
+    padding: 1.75rem 1.25rem 0;
+  }
+}
+
+.hd-hero-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: start;
+}
+
+.hd-hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.9rem;
+  padding: 0.25rem 0.85rem 0.25rem 0.3rem;
+  padding-inline: 0.3rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--secondary) 22%, var(--lightgray));
+  background: var(--hd-surface);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--secondary);
+}
+.hd-hero-badge {
+  display: inline-grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  background: var(--secondary);
+  color: var(--hd-button-text);
+  font-weight: 800;
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.hd-hero h1 {
+  margin: 0;
+  font-size: clamp(2.2rem, 6vw, 3.4rem);
+  font-weight: 800;
+  line-height: 1.1;
+  text-wrap: balance;
+  color: var(--dark);
+}
+.hd-hero-accent {
+  color: var(--secondary);
+}
+.hd-hero-lead {
+  max-width: 34rem;
+  margin: 1rem 0 0;
+  font-size: 1.15rem;
+  line-height: 1.7;
+  color: var(--darkgray);
+}
+.hd-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.6rem;
+}
+
+// התמונה נחתכת בתחתית החלון, כך שקצה הלוח חותך אותו והוא נראה כאילו עולה ממנו.
+.hd-hero-picture {
+  margin-inline: auto;
+  width: min(100%, 34rem);
+  margin-bottom: -1px;
+}
+.hd-hero-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 12px 30px rgb(27 28 40 / 0.12));
+
+  & text {
+    font-family: var(--bodyFont);
+  }
+  & .a-window {
+    fill: var(--light);
+    stroke: color-mix(in srgb, var(--secondary) 22%, var(--lightgray));
+  }
+  & .a-rule {
+    stroke: var(--lightgray);
+  }
+  & .a-dot-1 {
+    fill: #ff5f57;
+  }
+  & .a-dot-2 {
+    fill: #febc2e;
+  }
+  & .a-dot-3 {
+    fill: #28c840;
+  }
+  & .a-address {
+    fill: var(--highlight);
+  }
+  & .a-url {
+    fill: var(--gray);
+    font: 10px var(--codeFont);
+  }
+  & .a-panel {
+    fill: color-mix(in srgb, var(--secondary) 4%, var(--light));
+  }
+  & .a-logo {
+    fill: var(--secondary);
+  }
+  & .a-logo-letter {
+    fill: var(--light);
+    font-size: 12px;
+    font-weight: 800;
+  }
+  & .a-site {
+    fill: var(--dark);
+    font-size: 12px;
+    font-weight: 800;
+  }
+  & .a-search {
+    fill: var(--light);
+    stroke: var(--lightgray);
+  }
+  & .a-group {
+    fill: var(--dark);
+    font-size: 10px;
+    font-weight: 700;
+  }
+  & .a-num {
+    fill: var(--gray);
+    font: 9px var(--codeFont);
+  }
+  & .a-num-on {
+    fill: var(--secondary);
+  }
+  & .a-current {
+    fill: var(--highlight);
+  }
+  & .a-line {
+    fill: var(--lightgray);
+  }
+  & .a-line-on {
+    fill: color-mix(in srgb, var(--secondary) 55%, var(--light));
+  }
+  & .a-eyebrow {
+    fill: var(--secondary);
+    font-size: 11px;
+    font-weight: 700;
+  }
+  & .a-title {
+    fill: var(--dark);
+    font-size: 24px;
+    font-weight: 800;
+  }
+  & .a-chip {
+    fill: none;
+    stroke: var(--lightgray);
+  }
+  & .a-text {
+    fill: var(--lightgray);
+  }
+  & .a-callout {
+    fill: rgba(var(--hd-cyan), 0.08);
+    stroke: rgba(var(--hd-cyan), 0.25);
+  }
+  & .a-callout-edge,
+  & .a-callout-icon {
+    fill: rgb(var(--hd-cyan));
+  }
+  & .a-callout-title {
+    fill: var(--hd-cyan-text);
+    font-size: 12px;
+    font-weight: 700;
+  }
+  & .a-callout-text {
+    fill: rgba(var(--hd-cyan), 0.25);
+  }
+  & .a-code {
+    fill: var(--hd-surface);
+    stroke: var(--lightgray);
+  }
+  & .a-mono {
+    fill: var(--darkgray);
+    font: 11px var(--codeFont);
+  }
+  & .a-mono-dim {
+    fill: var(--gray);
+  }
+  & .a-mono-key {
+    fill: var(--secondary);
+  }
+  & .a-mono-ok {
+    fill: var(--hd-green-text);
+  }
+}
+
+// כרטיסי הפרקים בעמוד הבית (theme/components/HomeChapters.tsx).
+.hd-home-chapters {
+  margin-top: 0.5rem;
+  & h2 {
+    margin: 2.25rem 0 0.9rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+}
+.hd-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 0.75rem;
+  & li {
+    margin: 0;
+  }
+}
+a.hd-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto 1fr;
+  column-gap: 0.75rem;
+  row-gap: 0.25rem;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--lightgray);
+  border-radius: var(--hd-radius);
+  background: var(--hd-surface);
+  box-shadow: var(--hd-shadow);
+  color: var(--darkgray);
+  font-weight: 400;
+  transition:
+    border-color 0.15s var(--hd-ease),
+    box-shadow 0.15s var(--hd-ease),
+    background-color 0.15s var(--hd-ease);
+  &:hover {
+    border-color: var(--secondary);
+    box-shadow: var(--hd-shadow-hover);
+    background: color-mix(in srgb, var(--secondary) 4%, var(--hd-surface));
+    & .hd-card-title {
+      color: var(--secondary);
+    }
+  }
+}
+.hd-card-number {
+  grid-row: 1 / span 2;
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 8px;
+  background: var(--highlight);
+  color: var(--secondary);
+  font: 600 0.8rem/1 var(--codeFont);
+}
+.hd-card-title {
+  font-weight: 700;
+  color: var(--dark);
+  line-height: 1.4;
+  transition: color 0.15s var(--hd-ease);
+}
+.hd-card-text {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--gray);
+}
+
+// ---------------------------------------------------------------- סוף העמוד
+
+.page > #quartz-body .center > hr {
+  display: none;
+}
+
+// הפרק הקודם / הבא.
+.hd-pager {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 3rem;
+  @media all and (max-width: 560px) {
+    grid-template-columns: 1fr;
+  }
+}
+.hd-pager-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--lightgray);
+  border-radius: var(--hd-radius);
+  background: var(--hd-surface);
+  color: var(--dark);
+  font-weight: 400;
+  transition:
+    border-color 0.15s var(--hd-ease),
+    box-shadow 0.15s var(--hd-ease);
+  &:hover {
+    border-color: var(--secondary);
+    box-shadow: var(--hd-shadow);
+    & .hd-pager-title {
+      color: var(--secondary);
+    }
+  }
+}
+.hd-pager-next {
+  align-items: flex-end;
+  text-align: end;
+  grid-column: 2;
+  @media all and (max-width: 560px) {
+    grid-column: 1;
+  }
+}
+.hd-pager-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--gray);
+  & svg {
+    width: 0.95rem;
+    height: 0.95rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+.hd-pager-title {
+  font-weight: 700;
+  line-height: 1.4;
+  transition: color 0.15s var(--hd-ease);
+}
+
+// העמודה הצדדית (שב-RTL משמאל): תוכן עניינים, גרף, קישורי העמוד, עם קו ביניהם.
+@media all and ($desktop) {
+  .page > #quartz-body .sidebar.right {
+    gap: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    & > * {
+      flex-shrink: 0;
+    }
+    & > * + * {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--lightgray);
+    }
+  }
+}
+@media all and not ($desktop) {
+  .page > #quartz-body .sidebar.right {
+    margin-top: 3rem;
+  }
+}
+
+.sidebar.right .graph {
+  & > h3 {
+    margin: 0 0 0.6rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--gray);
+  }
+  & > .graph-outer {
+    margin: 0;
+    border-radius: var(--hd-radius-small);
+    background: var(--hd-surface);
+    // RTL: כפתור הגרף הגלובלי בפינה של צד הסוף.
+    & > .global-graph-icon {
+      right: auto;
+      inset-inline-end: 0;
+    }
+  }
+}
+
+.hd-page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.875rem;
+  & a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: var(--gray);
+    font-weight: 500;
+    background: none;
+    transition: color 0.15s var(--hd-ease);
+    &:hover {
+      color: var(--secondary);
+    }
+  }
+  & svg {
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+.hd-page-actions-rail {
+  display: none;
+  @media all and ($desktop) {
+    display: flex;
+    flex-direction: column;
+    & .hd-rail-group {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    & .hd-rail-group + .hd-rail-group {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--lightgray);
+    }
+    & h3 {
+      margin: 0 0 0.3rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--gray);
+    }
+    & a {
+      min-height: 2rem;
+    }
+  }
+}
+.hd-page-actions-end {
+  gap: 0 1.5rem;
+  margin: 1.5rem 0 0;
+  & a {
+    min-height: 44px;
+  }
+  @media all and ($desktop) {
+    display: none;
+  }
+}
+
+// ---------------------------------------------------------------- פוטר
+
+// שורה שקטה אחת לרוחב כל העמוד (שתי העמודות והמאמר שביניהן).
+.page > #quartz-body {
+  @media all and ($desktop) {
+    grid-template-areas:
+      "grid-sidebar-left grid-header grid-sidebar-right"
+      "grid-sidebar-left grid-center grid-sidebar-right"
+      "grid-footer grid-footer grid-footer";
+  }
+  @media all and ($tablet) {
+    grid-template-areas:
+      "grid-sidebar-left grid-header"
+      "grid-sidebar-left grid-center"
+      "grid-sidebar-left grid-sidebar-right"
+      "grid-footer grid-footer";
+  }
+}
+
+// העמודות הצדדיות נשארות במסך לכל אורך העמוד (sticky), ונעצרות מעל הפוטר.
+.page > #quartz-body {
+  --hd-footer-room: 7.5rem;
+  @media all and not ($mobile) {
+    & .sidebar.left {
+      margin-bottom: var(--hd-footer-room);
+    }
+  }
+  @media all and ($desktop) {
+    & .sidebar.right {
+      margin-bottom: var(--hd-footer-room);
+    }
+  }
+}
+
+.page > #quartz-body > footer.hd-footer {
+  opacity: 1;
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: none;
+  width: auto;
+  margin: 2.5rem 0 0;
+  padding: 0.5rem 0 1rem;
+  border-top: 1px solid var(--lightgray);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0 2rem;
+  font-size: 0.85rem;
+  color: var(--gray);
+
+  @media all and not ($mobile) {
+    margin-inline: 2rem;
+  }
+  @media all and ($mobile) {
+    margin-inline: 0;
+    padding-bottom: 1.25rem;
+    gap: 0 0.75rem;
+  }
+  @media all and (max-width: 640px) {
+    & .hd-footer-extra {
+      display: none;
+    }
+  }
+
+  & .hd-footer-name {
+    margin: 0;
+    color: var(--gray);
+    font-weight: 500;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0 0.4em;
+    & a {
+      min-height: 0;
+    }
+  }
+  & ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0 1.75rem;
+    margin: 0;
+    margin-inline-start: auto;
+    padding: 0;
+    list-style: none;
+    @media all and ($mobile) {
+      flex-wrap: nowrap;
+      gap: 0 1rem;
+    }
+  }
+  & li {
+    margin: 0;
+  }
+  & a,
+  & .hd-theme {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    width: auto;
+    height: auto;
+    min-height: 44px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    color: var(--gray);
+    font: inherit;
+    font-weight: 500;
+    background: none;
+    cursor: pointer;
+    transition: color 0.15s var(--hd-ease);
+    &:hover {
+      color: var(--darkgray);
+    }
+  }
+  & .hd-theme {
+    min-width: 2rem;
+    justify-content: center;
+    margin-inline-end: -0.4rem;
+    & svg {
+      position: static;
+      flex: none;
+      width: 1.2rem;
+      height: 1.2rem;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    &:focus-visible {
+      outline: 2px solid var(--secondary);
+      outline-offset: -4px;
+      border-radius: 6px;
+    }
+    & .hd-to-dark,
+    & .hd-to-light {
+      display: inline-flex;
+      align-items: center;
+    }
+    & .hd-to-light {
+      display: none;
+    }
+  }
+}
+:root[saved-theme="dark"] .hd-footer .hd-theme {
+  & .hd-to-dark {
+    display: none;
+  }
+  & .hd-to-light {
+    display: inline-flex;
+  }
+}
+.hd-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+// ---------------------------------------------------------------- 404
+
+.page[data-frame="minimal"] > #quartz-body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  grid-template-rows: minmax(0, 1fr) auto;
+  padding: 0;
+  & .center.minimal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 2.5rem 1rem 0;
+  }
+  @media all and ($mobile) {
+    & > footer.hd-footer {
+      margin-inline: 1rem;
+    }
+  }
+}
+
+.hd-404 {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(100%, 36rem);
+  padding: 2.5rem 1.5rem 2.25rem;
+  border: 1px solid color-mix(in srgb, var(--secondary) 20%, var(--lightgray));
+  border-radius: 20px;
+  text-align: center;
+  background: linear-gradient(to bottom, var(--hd-band-from), var(--hd-band-to));
+}
+// (.page .hd-404 > … כדי לגבור על הכלל של כותרות המאמר למעלה)
+.page .hd-404 > .hd-404-number {
+  margin: 0;
+  font: 800 clamp(5rem, 18vw, 8rem) / 1 var(--headerFont);
+  letter-spacing: -0.04em;
+  color: var(--secondary);
+  // המספר נשאר 404 גם בעמוד RTL.
+  direction: ltr;
+}
+.hd-404-title {
+  margin: 0.75rem 0 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--dark);
+}
+.hd-404-lead {
+  max-width: 26rem;
+  margin: 0.5rem 0 0;
+  color: var(--darkgray);
+}
+.hd-404-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+// ---------------------------------------------------------------- תיקוני RTL כלליים
+
+// פס הטעינה של Quartz (בזמן מעבר בין עמודים) גדל מצד ההתחלה.
+.navigation-progress {
+  left: auto;
+  inset-inline-start: 0;
+}
+
+// חלון התצוגה המקדימה (popover) של קישור: הטקסט בכיוון העמוד.
+.popover > .popover-inner {
+  direction: rtl;
+  text-align: start;
+  [dir="ltr"] & {
+    direction: ltr;
+  }
+}
+
+// הערות שוליים: החץ חזרה (↩) והמספרים.
+.footnotes {
+  & ol {
+    padding-inline-start: 1.4rem;
+  }
+}
+
+// הדפסה: בלי העמודות הצדדיות, הפוטר והכפתורים; קישורים מקבלים את הכתובת.
+@media print {
+  .page > #quartz-body {
+    display: block;
+    padding: 0;
+  }
+  .sidebar,
+  .hd-footer,
+  .hd-pager,
+  .hd-page-actions,
+  .hd-onpage,
+  .hd-skip,
+  .hd-hero-picture {
+    display: none !important;
+  }
+  .page > #quartz-body .center {
+    max-width: none;
+  }
+  .hd-band {
+    border: 0;
+    padding: 0;
+    background: none;
+  }
+  .hd-band-number {
+    display: none;
+  }
+  pre {
+    white-space: pre-wrap;
+  }
+}
