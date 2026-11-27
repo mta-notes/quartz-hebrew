@@ -1,2 +1,3 @@
 # ריפואי הקורסים שנבנים מחדש בכל push ל-main של הבסיס (rebuild-courses.yml).
 # ריפו אחד בכל שורה, owner/name. שורה שמתחילה ב-# היא הערה.
+mta-notes/computer-architecture
