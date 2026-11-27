@@ -1,7 +1,8 @@
 # yaml-language-server: $schema=./quartz/plugins/quartz-plugins.schema.json
 #
-# הגדרות Quartz 5 של האתר. scripts/assemble.mjs מעתיק את הקובץ הזה לתיקיית
-# quartz/ לפני כל בנייה, אז משנים רק כאן.
+# הגדרות Quartz 5 המשותפות לכל הקורסים. scripts/assemble.mjs מעתיק את הקובץ
+# הזה לתיקיית quartz/ לפני כל בנייה, ומשנים רק כאן. קורס שצריך משהו אחר כותב
+# אותו ב-overrides/config.yaml שלו, שמתמזג מעל הקובץ הזה.
 #
 # מה שונה מברירת המחדל של Quartz:
 # - locale: he-IL. Quartz כותב <html lang="he" dir="rtl">, וכל הטקסטים שלו
@@ -13,15 +14,16 @@
 # - תמונת השיתוף (og-image) כבויה: Satori, שמצייר אותה, לא תומך בכתב מימין לשמאל
 #   והיה מצייר את העברית הפוכה.
 configuration:
-  pageTitle: Quartz בעברית
-  pageTitleSuffix: " | Quartz בעברית"
+  # שלושת אלה נדרסים תמיד: theme/site.ts מציב בהם את name ואת baseUrl
+  # מ-course.ts של הקורס. הקובץ הזה משותף לכל הקורסים ולא כותב שם של אף אחד.
+  pageTitle: קורס
+  pageTitleSuffix: ""
+  baseUrl: example.com
   enableSPA: true
   enablePopovers: true
   prefetch: viewport
   analytics: null
   locale: he-IL
-  # הכתובת שבה האתר יפורסם, בלי https://. ב-GitHub Pages: <משתמש>.github.io/<ריפו>
-  baseUrl: mta-notes.github.io/quartz-hebrew
   ignorePatterns:
     - private
     - templates
