@@ -40,8 +40,6 @@ export interface SiteOptions {
   contentDir?: string
   hero: Options<typeof HomeHero>
   notFound: Omit<Options<typeof NotFound>, "repository">
-  /** קבוצת הקישורים של האתר בעמודה הצדדית. */
-  rail?: NonNullable<Options<typeof PageActions>["extra"]>
   footer: Omit<Options<typeof SiteFooter>, "toggle">
 }
 
@@ -72,7 +70,7 @@ export async function createSite(site: SiteOptions) {
       right: [
         TableOfContents(),
         ...(base.defaults.right ?? []).filter((component) => component.name !== "TableOfContents"),
-        PageActions({ repository, branch, contentDir, place: "rail", extra: site.rail }),
+        PageActions({ repository, branch, contentDir, place: "rail" }),
       ],
       beforeBody: [HomeHero(site.hero), PageHeader(), ...(base.defaults.beforeBody ?? [])],
       afterBody: [

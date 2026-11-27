@@ -45,7 +45,7 @@ baseUrl: mta-notes.github.io/quartz-hebrew
 | עמוד הבית | `HomeHero.tsx`, `HomeChapters.tsx` | הכותרת הגדולה וכרטיסי הפרקים |
 | תוכן העניינים | `TableOfContents.tsx` | מסמן את הסעיף הנוכחי ואת ההתקדמות |
 | ניווט בין פרקים | `ChapterPager.tsx` | הקודם והבא, וקיצורי מקלדת |
-| קישורי העמוד | `PageActions.tsx` | עזרה, עריכה והיסטוריה |
+| קישורי העמוד | `PageActions.tsx` | "לדווח על טעות" ו"לערוך את העמוד" |
 | פוטר | `SiteFooter.tsx` | שם, קישורים ומתג מצב כהה |
 | עמוד 404 | `NotFound.tsx` | כתובת שלא קיימת |
 

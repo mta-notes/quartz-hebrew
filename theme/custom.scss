@@ -1602,11 +1602,6 @@ a.hd-card {
       flex-direction: column;
       align-items: flex-start;
     }
-    & .hd-rail-group + .hd-rail-group {
-      margin-top: 1rem;
-      padding-top: 1rem;
-      border-top: 1px solid var(--lightgray);
-    }
     & h3 {
       margin: 0 0 0.3rem;
       font-size: 0.8rem;

@@ -27,14 +27,6 @@ const site = await createSite({
 
   notFound: { homeText: "לעמוד הבית" },
 
-  rail: {
-    title: "האתר",
-    links: [
-      { text: "הקוד ב-GitHub", href: `https://github.com/${repository}`, icon: "github" },
-      { text: "התיעוד של Quartz", href: "https://quartz.jzhao.xyz", icon: "book" },
-    ],
-  },
-
   footer: {
     name: "Quartz בעברית",
     year: new Date().getFullYear(),
