@@ -1,5 +1,5 @@
-// מה שהאתר בונה תמיד באותה דרך. quartz.ts (בשורש הריפו) נותן רק את הטקסטים
-// והקישורים של האתר:
+// מה שכל אתר קורס בונה תמיד באותה דרך. course.ts של הקורס נותן רק את מה
+// שייחודי לו (שם, ריפו, כתובת, טקסטים של עמוד הבית):
 //
 //   import { createSite } from "./theme/site"
 //   const site = await createSite({ … })
@@ -30,7 +30,7 @@ type Options<T extends (...args: never[]) => unknown> = NonNullable<Parameters<T
 export interface SiteOptions {
   /** שם הקורס: כותרת האתר, סיומת ה-<title> והפוטר. */
   name: string
-  /** owner/name של הריפו ב-GitHub, לקישורי "עריכה" ו"היסטוריה". */
+  /** owner/name של הריפו ב-GitHub, לקישורי "לערוך את העמוד" ו"לדווח על טעות". */
   repository: string
   /** הכתובת שבה האתר מפורסם, בלי https://. ב-GitHub Pages: <משתמש>.github.io/<ריפו> */
   baseUrl: string
@@ -39,8 +39,10 @@ export interface SiteOptions {
   /** התיקייה שבה העמודים כתובים בריפו. ברירת מחדל: content */
   contentDir?: string
   hero: Options<typeof HomeHero>
-  notFound: Omit<Options<typeof NotFound>, "repository">
-  footer: Omit<Options<typeof SiteFooter>, "toggle">
+  /** אופציונלי: איך נקראת הדרך חזרה בעמוד 404. ברירת מחדל: "לעמוד הבית". */
+  notFound?: Omit<Options<typeof NotFound>, "repository">
+  /** אופציונלי: מי ערך את הסיכומים, בפוטר. ברירת מחדל: "ניב". */
+  footer?: { editedBy?: string }
 }
 
 export async function createSite(site: SiteOptions) {
@@ -56,7 +58,7 @@ export async function createSite(site: SiteOptions) {
   // עמוד 404 משלנו, במקום הכותרת הריקה של Quartz.
   const notFound = config.plugins.pageTypes?.find((pageType) => pageType.name === "404")
   if (notFound) {
-    notFound.body = () => NotFound({ ...site.notFound, repository })
+    notFound.body = () => NotFound({ homeText: "לעמוד הבית", ...site.notFound, repository })
   }
 
   // הפריסה ש-quartz.config.yaml בונה, עם הרכיבים של האתר.
@@ -80,7 +82,7 @@ export async function createSite(site: SiteOptions) {
         // אותם קישורים מתחת למאמר, ברוחבים שאין בהם עמודה צדדית.
         PageActions({ repository, branch, contentDir, place: "end" }),
       ],
-      footer: [SiteFooter({ ...site.footer, toggle })],
+      footer: [SiteFooter({ name, editedBy: site.footer?.editedBy ?? "ניב", toggle })],
     },
   })
 

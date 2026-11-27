@@ -6,7 +6,7 @@
 
 import { createSite } from "./theme/site"
 
-// owner/name של הריפו ב-GitHub. משמש לקישורי "עריכה", "היסטוריה" ו"שאלה".
+// owner/name של הריפו ב-GitHub. משמש לקישורי "לערוך את העמוד" ו"לדווח על טעות".
 const repository = "mta-notes/quartz-hebrew"
 
 const site = await createSite({
@@ -26,17 +26,6 @@ const site = await createSite({
   },
 
   notFound: { homeText: "לעמוד הבית" },
-
-  footer: {
-    name: "Quartz בעברית",
-    year: new Date().getFullYear(),
-    license: { text: "רישיון MIT", href: `https://github.com/${repository}/blob/main/LICENSE` },
-    links: [
-      { text: "GitHub", href: `https://github.com/${repository}` },
-      { text: "RSS", href: "/index.xml", hideOnPhone: true },
-      { text: "נבנה עם Quartz", href: "https://quartz.jzhao.xyz", hideOnPhone: true },
-    ],
-  },
 })
 
 export default site.config
