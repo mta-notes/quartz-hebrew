@@ -8,7 +8,7 @@
 
 import type { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "../../quartz/components/types"
 import type { FullSlug } from "../../quartz/util/path"
-import { chapterList, minutesToRead, readingTimeLabel } from "./chapters"
+import { findChapter, minutesToRead, readingTimeLabel } from "./chapters"
 
 // Lucide icons (ISC License).
 const ICON = {
@@ -39,7 +39,7 @@ export default ((opts: Options) => {
     if (slug === "index" || slug === "404") return null
 
     const title = String(fileData.frontmatter?.title ?? "")
-    const chapter = chapterList(allFiles).find((c) => c.slug === slug)
+    const chapter = findChapter(allFiles, slug)
 
     const text = fileData.text
     const date = fileData.dates?.modified

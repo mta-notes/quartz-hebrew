@@ -1,7 +1,8 @@
 // פרקי המדריך, לפי סדר הקריאה, והקבוצות שהם מחולקים אליהן.
 //
-// הסדר הוא סדר שמות הקבצים (01, 02, … 10, 11). הקבוצה של פרק נכתבת בראש
-// הקובץ שלו, בשדה group:
+// הסדר הוא סדר שמות הקבצים (01, 02, … 10, 11): שם הקובץ קובע את הסדר בלבד.
+// המספר שמוצג ליד פרק הוא המקום שלו בתוך הקבוצה, כך שכל קבוצה מתחילה מ-01.
+// הקבוצה של פרק נכתבת בראש הקובץ שלו, בשדה group:
 //
 //   ---
 //   title: התקנה והרצה
@@ -10,7 +11,9 @@
 //   ---
 //
 // הקבוצות מופיעות לפי הפרק הראשון בכל אחת. פרק בלי group נכנס לקבוצה "עוד".
-// אתר שאף פרק בו לא כתב group מקבל רשימה אחת, בלי כותרות.
+// אתר שאף פרק בו לא כתב group מקבל רשימה אחת, בלי כותרות, וממוספרת ברצף מ-01.
+//
+// כל מה שמציג מספר פרק לוקח אותו מ-chapterGroups או מ-findChapter, לא מ-chapterList.
 
 import type { QuartzPluginData } from "../../quartz/plugins/vfile"
 
@@ -18,7 +21,7 @@ export interface Chapter {
   slug: string
   title: string
   description?: string
-  /** "01" עבור 01-welcome; undefined כשבשם אין מספר. */
+  /** המקום בתוך הקבוצה: "01", "02", … נקבע רק ב-chapterGroups. */
   number?: string
   group?: string
 }
@@ -50,16 +53,20 @@ export function chapterList(allFiles: QuartzPluginData[]): Chapter[] {
         slug,
         title: String(file.frontmatter?.title ?? name),
         description: (file.frontmatter?.description as string | undefined) ?? file.description,
-        number: /^(\d+)-/.exec(name)?.[1],
         group: typeof group === "string" && group.trim() ? group.trim() : undefined,
       }
     })
     .sort((a, b) => a.slug.localeCompare(b.slug, "en", { numeric: true, sensitivity: "base" }))
 }
 
+const numbered = (group: ChapterGroup): ChapterGroup => ({
+  ...group,
+  chapters: group.chapters.map((chapter, i) => ({ ...chapter, number: String(i + 1).padStart(2, "0") })),
+})
+
 export function chapterGroups(allFiles: QuartzPluginData[]): ChapterGroup[] {
   const chapters = chapterList(allFiles)
-  if (!chapters.some((chapter) => chapter.group)) return [{ id: "all", chapters }]
+  if (!chapters.some((chapter) => chapter.group)) return [numbered({ id: "all", chapters })]
 
   const groups = new Map<string, ChapterGroup>()
   for (const chapter of chapters) {
@@ -68,7 +75,14 @@ export function chapterGroups(allFiles: QuartzPluginData[]): ChapterGroup[] {
     groups.get(title)!.chapters.push(chapter)
   }
   // "עוד" תמיד בסוף.
-  return [...groups.values()].sort((a, b) => Number(a.title === OTHER) - Number(b.title === OTHER))
+  return [...groups.values()].sort((a, b) => Number(a.title === OTHER) - Number(b.title === OTHER)).map(numbered)
+}
+
+/** הפרק של העמוד, עם המספר שלו בתוך הקבוצה; undefined לעמוד שאינו פרק. */
+export function findChapter(allFiles: QuartzPluginData[], slug: string): Chapter | undefined {
+  return chapterGroups(allFiles)
+    .flatMap((group) => group.chapters)
+    .find((chapter) => chapter.slug === slug)
 }
 
 /** הפרק הקודם והבא לפי סדר הקריאה. */
