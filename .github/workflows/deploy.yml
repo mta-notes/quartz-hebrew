@@ -1,4 +1,5 @@
-# בונה את האתר ומפרסם אותו ב-GitHub Pages בכל push ל-main.
+# מפרסם את אתר ההדגמה ב-GitHub Pages בכל push ל-main, באותו תהליך שכל הקורסים
+# משתמשים בו (build-course.yml).
 # הפעלה חד-פעמית: Settings → Pages → Build and deployment → Source: GitHub Actions.
 name: Build and deploy
 
@@ -12,38 +13,6 @@ permissions:
   pages: write
   id-token: write
 
-concurrency:
-  group: pages
-  cancel-in-progress: false
-
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          # כל ההיסטוריה, כדי ש"עודכן ב..." יהיה תאריך השינוי האחרון ב-Git.
-          fetch-depth: 0
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 22
-      - name: Cache Quartz
-        uses: actions/cache@v6
-        with:
-          path: quartz
-          key: quartz-${{ hashFiles('quartz-version.txt') }}
-      - name: Build
-        run: ./build.sh
-      - uses: actions/upload-pages-artifact@v5
-        with:
-          path: public
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v5
+  site:
+    uses: ./.github/workflows/build-course.yml

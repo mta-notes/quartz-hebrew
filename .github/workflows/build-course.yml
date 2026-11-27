@@ -1,0 +1,61 @@
+# בונה אתר של קורס ומפרסם אותו ב-GitHub Pages. כל ריפו קורס קורא לו מ-deploy.yml
+# שלו (וגם ריפו הבסיס, לאתר ההדגמה):
+#
+#   jobs:
+#     site:
+#       uses: mta-notes/quartz-hebrew/.github/workflows/build-course.yml@main
+#
+# הקורא צריך את ההרשאות pages: write ו-id-token: write.
+name: Build course
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # כל ההיסטוריה, בשביל תאריכי השינוי של העמודים (מפת האתר, RSS).
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      # ריפו קורס מושך את הבסיס ל-.theme/ לפי theme-version.txt; ריפו הבסיס הוא
+      # הבסיס של עצמו. מושכים כבר כאן, כדי שמפתח המטמון יהיה גרסת Quartz של הבסיס.
+      - name: Fetch theme
+        run: |
+          if [[ ! -f theme/site.ts ]]; then
+            ref="$(tr -d '[:space:]' < theme-version.txt 2>/dev/null || true)"
+            git clone --quiet --depth 1 --branch "${ref:-main}" https://github.com/mta-notes/quartz-hebrew.git .theme
+          fi
+      - name: Cache Quartz
+        uses: actions/cache@v6
+        with:
+          path: quartz
+          key: quartz-${{ hashFiles('quartz-version.txt', '.theme/quartz-version.txt') }}
+      - name: Build
+        run: ./build.sh
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
