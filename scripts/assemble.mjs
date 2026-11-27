@@ -1,11 +1,11 @@
-// מרכיב את האתר בתוך תיקיית Quartz: התבנית (theme/), הטקסטים (quartz.ts)
+// מרכיב את האתר בתוך תיקיית Quartz: התבנית (theme/), הגדרות הקורס (course.ts)
 // וההגדרות (quartz.config.yaml) מהריפו הזה. dev.sh, build.sh ותהליך הפרסום
 // ב-GitHub Actions מריצים אותו, כך שכולם בונים בדיוק אותו דבר.
 //
 // שימוש: node scripts/assemble.mjs [תיקיית Quartz, ברירת מחדל: ./quartz]
 //
 // מה הוא עושה, לפי הסדר:
-//   1. מעתיק את quartz.ts ואת quartz.config.yaml לתיקיית Quartz;
+//   1. מעתיק את course.ts (בשם quartz.ts) ואת quartz.config.yaml לתיקיית Quartz;
 //   2. מעתיק את theme/ ל-<Quartz>/theme (הרכיבים מייבאים ממנה);
 //   3. מעתיק את custom.scss מעל quartz/styles/custom.scss של Quartz, ואת
 //      theme/static/ (גופנים, לוגו, אייקון) לתוך quartz/static/.
@@ -24,7 +24,7 @@ if (!existsSync(join(quartz, "package.json"))) {
 }
 
 // 1. הטקסטים וההגדרות.
-cpSync(join(root, "quartz.ts"), join(quartz, "quartz.ts"))
+cpSync(join(root, "course.ts"), join(quartz, "quartz.ts"))
 cpSync(join(root, "quartz.config.yaml"), join(quartz, "quartz.config.yaml"))
 
 // 2. התבנית.
