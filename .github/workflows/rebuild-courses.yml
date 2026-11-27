@@ -1,0 +1,31 @@
+# בכל push ל-main של הבסיס: מריץ את deploy.yml בכל ריפו שרשום ב-courses.txt,
+# כדי ששינוי עיצוב יגיע לכל הקורסים מיד ולא רק בפעם הבאה שהם נבנים.
+#
+# צריך secret בשם COURSES_TOKEN (ראו README.md). בלעדיו הג'וב מדלג בשקט.
+name: Rebuild courses
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Run deploy.yml in every course
+        env:
+          GH_TOKEN: ${{ secrets.COURSES_TOKEN }}
+        run: |
+          if [[ -z "$GH_TOKEN" ]]; then
+            echo "אין COURSES_TOKEN; מדלג."
+            exit 0
+          fi
+          grep -v '^\s*\(#\|$\)' courses.txt | while read -r repo; do
+            echo "בונה מחדש את $repo"
+            gh workflow run deploy.yml -R "$repo" || echo "::warning::לא הצלחתי להריץ את deploy.yml ב-$repo"
+          done
