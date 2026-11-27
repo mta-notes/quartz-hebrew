@@ -16,7 +16,8 @@ const row = (y: number, width: number, current = false, number = "") =>
   `<text class="${current ? "a-num a-num-on" : "a-num"}" x="528" y="${y}" direction="rtl" text-anchor="start">${number}</text>` +
   `<rect class="${current ? "a-line a-line-on" : "a-line"}" x="${506 - width}" y="${y - 7}" width="${width}" height="6" rx="3"/>`
 
-const ART = `
+// name: שם האתר שמופיע בראש רשימת הפרקים שבתמונה (נחתך אם הוא ארוך מהמקום).
+const art = (name: string) => `
 <svg class="hd-hero-art" viewBox="0 0 560 400" role="img" aria-labelledby="hd-art-title">
   <title id="hd-art-title">חלון דפדפן ובו אתר תיעוד בעברית: רשימת הפרקים מימין, הכותרת "ברוכים הבאים", תיבת טיפ ובלוק קוד.</title>
   <rect class="a-window" x="20" y="20" width="520" height="420" rx="14"/>
@@ -30,7 +31,7 @@ const ART = `
   <rect class="a-panel" x="392" y="55" width="147" height="384"/>
   <rect class="a-logo" x="510" y="70" width="18" height="18" rx="5"/>
   <text class="a-logo-letter" x="519" y="84" text-anchor="middle">א</text>
-  <text class="a-site" x="502" y="84" direction="rtl" text-anchor="start">Quartz בעברית</text>
+  <text class="a-site" x="502" y="84" direction="rtl" text-anchor="start">${escape(name.length > 16 ? `${name.slice(0, 15)}…` : name)}</text>
   <rect class="a-search" x="404" y="100" width="124" height="22" rx="6"/>
   <text class="a-group" x="528" y="148" direction="rtl" text-anchor="start">צעדים ראשונים</text>
   ${row(168, 80, true, "01")}${row(190, 64, false, "02")}${row(212, 88, false, "03")}
@@ -57,6 +58,9 @@ const ART = `
   <text class="a-mono a-mono-ok" x="58" y="378" direction="ltr">✓ Done in 1.2s</text>
 </svg>`
 
+const escape = (text: string) =>
+  text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
+
 interface Options {
   /** השורה הקטנה מעל הכותרת. */
   eyebrow: string
@@ -70,7 +74,7 @@ interface Options {
 }
 
 export default ((opts: Options) => {
-  const HomeHero: QuartzComponent = ({ fileData, allFiles }: QuartzComponentProps) => {
+  const HomeHero: QuartzComponent = ({ fileData, allFiles, cfg }: QuartzComponentProps) => {
     const slug = fileData.slug as FullSlug
     if (slug !== "index") return null
     const first = chapterList(allFiles)[0]
@@ -99,7 +103,7 @@ export default ((opts: Options) => {
             </a>
           </div>
         </div>
-        <div class="hd-hero-picture" dangerouslySetInnerHTML={{ __html: ART }} />
+        <div class="hd-hero-picture" dangerouslySetInnerHTML={{ __html: art(cfg.pageTitle) }} />
       </section>
     )
   }
