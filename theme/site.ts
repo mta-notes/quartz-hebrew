@@ -28,12 +28,16 @@ import { HeadingAnchors } from "./transforms/headingAnchors"
 type Options<T extends (...args: never[]) => unknown> = NonNullable<Parameters<T>[0]>
 
 export interface SiteOptions {
+  /** שם הקורס: כותרת האתר, סיומת ה-<title> והפוטר. */
+  name: string
   /** owner/name של הריפו ב-GitHub, לקישורי "עריכה" ו"היסטוריה". */
   repository: string
-  /** הענף הראשי שלו. */
-  branch: string
-  /** התיקייה שבה העמודים כתובים בריפו. */
-  contentDir: string
+  /** הכתובת שבה האתר מפורסם, בלי https://. ב-GitHub Pages: <משתמש>.github.io/<ריפו> */
+  baseUrl: string
+  /** הענף הראשי שלו. ברירת מחדל: main */
+  branch?: string
+  /** התיקייה שבה העמודים כתובים בריפו. ברירת מחדל: content */
+  contentDir?: string
   hero: Options<typeof HomeHero>
   notFound: Omit<Options<typeof NotFound>, "repository">
   /** קבוצת הקישורים של האתר בעמודה הצדדית. */
@@ -42,9 +46,13 @@ export interface SiteOptions {
 }
 
 export async function createSite(site: SiteOptions) {
-  const { repository, branch, contentDir } = site
+  const { name, repository, baseUrl, branch = "main", contentDir = "content" } = site
 
   const config = await loadQuartzConfig()
+  // כל מה שתלוי בקורס מגיע מכאן, ו-quartz.config.yaml של הבסיס נשאר משותף.
+  config.configuration.pageTitle = name
+  config.configuration.pageTitleSuffix = ` | ${name}`
+  config.configuration.baseUrl = baseUrl
   config.plugins.transformers.push(CalloutTitles(), BidiDirection(), HeadingAnchors(), FontPreload())
 
   // עמוד 404 משלנו, במקום הכותרת הריקה של Quartz.

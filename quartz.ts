@@ -7,7 +7,9 @@ import { createSite } from "./theme/site"
 const repository = "mta-notes/quartz-hebrew"
 
 const site = await createSite({
+  name: "Quartz בעברית",
   repository,
+  baseUrl: "mta-notes.github.io/quartz-hebrew",
   branch: "main",
   contentDir: "content",
 
