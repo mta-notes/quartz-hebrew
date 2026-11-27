@@ -1752,7 +1752,9 @@ a.hd-card {
     }
   }
 }
-:root[saved-theme="dark"] .hd-footer .hd-theme {
+// אותה רמת ספציפיות כמו הכלל של הפוטר למעלה (עם #quartz-body), כדי שבמצב כהה
+// השמש תוצג ולא הירח.
+:root[saved-theme="dark"] .page > #quartz-body > footer.hd-footer .hd-theme {
   & .hd-to-dark {
     display: none;
   }
