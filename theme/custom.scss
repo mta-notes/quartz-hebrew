@@ -278,8 +278,8 @@ h6 {
 
 // ---------------------------------------------------------------- ראש העמוד
 
-// מצויר ב-theme/components/PageHeader.tsx: פס צבעוני ובו שם הקבוצה, הכותרת וזמן
-// הקריאה. מספר הפרק גדול וחיוור בקצה הפס (שמאל, ב-RTL).
+// מצויר ב-theme/components/PageHeader.tsx: פס צבעוני ובו שם הקבוצה והכותרת.
+// מספר הפרק גדול וחיוור בקצה הפס (שמאל, ב-RTL).
 .hd-page-head {
   margin-top: 0.5rem;
   outline: none;
@@ -291,7 +291,7 @@ h6 {
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 1.6rem 1.75rem 1.4rem;
+  padding: 1.6rem 1.75rem;
   border-radius: 16px;
   border: 1px solid color-mix(in srgb, var(--secondary) 18%, var(--lightgray));
   background: linear-gradient(to left, var(--hd-band-from), var(--hd-band-to));
@@ -344,49 +344,6 @@ h6 {
   text-wrap: balance;
   margin: 0;
   color: var(--dark);
-}
-
-.hd-page-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin: 0.9rem 0 0;
-}
-
-.hd-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.2rem 0.65rem;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--secondary) 16%, var(--lightgray));
-  background: var(--hd-surface);
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: var(--gray);
-  & time {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-  }
-  & svg {
-    width: 0.9rem;
-    height: 0.9rem;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-}
-a.hd-chip {
-  transition:
-    color 0.15s var(--hd-ease),
-    border-color 0.15s var(--hd-ease);
-  &:hover {
-    color: var(--secondary);
-    border-color: var(--secondary);
-  }
 }
 
 // "בעמוד הזה": רק ברוחבים שאין בהם עמודת תוכן עניינים.
@@ -1389,10 +1346,6 @@ blockquote,
     fill: var(--dark);
     font-size: 24px;
     font-weight: 800;
-  }
-  & .a-chip {
-    fill: none;
-    stroke: var(--lightgray);
   }
   & .a-text {
     fill: var(--lightgray);

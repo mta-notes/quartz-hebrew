@@ -92,17 +92,3 @@ export function neighbours(allFiles: QuartzPluginData[], slug: string) {
   if (index === -1) return { previous: undefined, next: undefined }
   return { previous: chapters[index - 1], next: chapters[index + 1] }
 }
-
-/** זמן קריאה בדקות. קוראים עברית בכ-180 מילים לדקה (מעט פחות מאנגלית, כי
- *  מילה עברית "מכילה" לרוב גם מילית יחס או ה' הידיעה). לפחות דקה אחת. */
-export function minutesToRead(text: string): number {
-  const words = text.split(/\s+/).filter((word) => /[\p{L}\p{N}]/u.test(word)).length
-  return Math.max(1, Math.ceil(words / 180))
-}
-
-/** "דקת קריאה", "שתי דקות קריאה", "5 דקות קריאה" */
-export function readingTimeLabel(minutes: number): string {
-  if (minutes === 1) return "דקת קריאה"
-  if (minutes === 2) return "שתי דקות קריאה"
-  return `${minutes} דקות קריאה`
-}

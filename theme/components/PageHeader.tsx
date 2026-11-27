@@ -1,24 +1,13 @@
-// ראש כל עמוד חוץ מעמוד הבית: פס צבעוני עם שם קבוצת הפרקים, הכותרת, זמן
-// הקריאה ומתי העמוד השתנה לאחרונה (קישור להיסטוריה שלו ב-GitHub). מספר הפרק
-// מופיע בגדול בקצה הפס, כקישוט. ברוחבים שאין בהם עמודת תוכן עניינים, רשימה
-// מקופלת "בעמוד הזה" מתחת לכותרת מראה את סעיפי העמוד.
+// ראש כל עמוד חוץ מעמוד הבית: פס צבעוני עם שם קבוצת הפרקים והכותרת. מספר
+// הפרק (המקום שלו בתוך הקבוצה) מופיע בגדול בקצה הפס, כקישוט. ברוחבים שאין בהם
+// עמודת תוכן עניינים, רשימה מקופלת "בעמוד הזה" מתחת לכותרת מראה את סעיפי העמוד.
 //
 // הוא מחליף שלושה רכיבים של Quartz (פירורי לחם, כותרת המאמר ושורת התאריך;
 // quartz.config.yaml מכבה אותם).
 
 import type { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "../../quartz/components/types"
 import type { FullSlug } from "../../quartz/util/path"
-import { findChapter, minutesToRead, readingTimeLabel } from "./chapters"
-
-// Lucide icons (ISC License).
-const ICON = {
-  clock: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
-  history: '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>',
-}
-
-const Icon = ({ name }: { name: keyof typeof ICON }) => (
-  <svg viewBox="0 0 24 24" aria-hidden="true" dangerouslySetInnerHTML={{ __html: ICON[name] }} />
-)
+import { findChapter } from "./chapters"
 
 interface TocEntry {
   depth: number
@@ -26,34 +15,14 @@ interface TocEntry {
   slug: string
 }
 
-interface Options {
-  repository: string
-  branch: string
-  contentDir: string
-}
-
-export default ((opts: Options) => {
-  const PageHeader: QuartzComponent = ({ fileData, cfg, allFiles }: QuartzComponentProps) => {
+export default (() => {
+  const PageHeader: QuartzComponent = ({ fileData, allFiles }: QuartzComponentProps) => {
     const slug = fileData.slug as FullSlug
     // לעמוד הבית יש ראש משלו (HomeHero.tsx); לעמוד 404 אין.
     if (slug === "index" || slug === "404") return null
 
     const title = String(fileData.frontmatter?.title ?? "")
     const chapter = findChapter(allFiles, slug)
-
-    const text = fileData.text
-    const date = fileData.dates?.modified
-    const relativePath = fileData.relativePath as string | undefined
-    const history = relativePath
-      ? `https://github.com/${opts.repository}/commits/${opts.branch}/${opts.contentDir}/${encodeURI(relativePath)}`
-      : undefined
-    const when = date?.toLocaleDateString(cfg.locale || "he-IL", { year: "numeric", month: "long", day: "numeric" })
-    const stamp = date && when && (
-      <time datetime={date.toISOString()}>
-        <Icon name="history" />
-        עודכן ב־{when}
-      </time>
-    )
 
     const toc = ((fileData as { toc?: TocEntry[] }).toc ?? []).filter((entry) => entry.text)
 
@@ -63,24 +32,6 @@ export default ((opts: Options) => {
           <div class="hd-band-text">
             {chapter?.group && <p class="hd-band-eyebrow">{chapter.group}</p>}
             <h1 class="article-title">{title}</h1>
-            {(text || stamp) && (
-              <p class="hd-page-meta">
-                {text && (
-                  <span class="hd-chip">
-                    <Icon name="clock" />
-                    {readingTimeLabel(minutesToRead(text))}
-                  </span>
-                )}
-                {stamp &&
-                  (history ? (
-                    <a class="hd-chip" href={history} title="מה השתנה בעמוד הזה">
-                      {stamp}
-                    </a>
-                  ) : (
-                    <span class="hd-chip">{stamp}</span>
-                  ))}
-              </p>
-            )}
           </div>
           {chapter?.number && (
             <span class="hd-band-number" aria-hidden="true">
@@ -120,4 +71,4 @@ export default ((opts: Options) => {
 `
 
   return PageHeader
-}) satisfies QuartzComponentConstructor<Options>
+}) satisfies QuartzComponentConstructor

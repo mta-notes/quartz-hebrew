@@ -74,7 +74,7 @@ export async function createSite(site: SiteOptions) {
         ...(base.defaults.right ?? []).filter((component) => component.name !== "TableOfContents"),
         PageActions({ repository, branch, contentDir, place: "rail", extra: site.rail }),
       ],
-      beforeBody: [HomeHero(site.hero), PageHeader({ repository, branch, contentDir }), ...(base.defaults.beforeBody ?? [])],
+      beforeBody: [HomeHero(site.hero), PageHeader(), ...(base.defaults.beforeBody ?? [])],
       afterBody: [
         HomeChapters(),
         ...(base.defaults.afterBody ?? []),

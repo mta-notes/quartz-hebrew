@@ -41,7 +41,7 @@ baseUrl: mta-notes.github.io/quartz-hebrew
 | רכיב | קובץ | מה הוא עושה |
 | --- | --- | --- |
 | רשימת הפרקים | `ChapterNav.tsx` | הפרקים בקבוצות, ומגירה בטלפון |
-| ראש העמוד | `PageHeader.tsx` | קבוצה, כותרת, זמן קריאה ותאריך |
+| ראש העמוד | `PageHeader.tsx` | קבוצה, כותרת ומספר הפרק |
 | עמוד הבית | `HomeHero.tsx`, `HomeChapters.tsx` | הכותרת הגדולה וכרטיסי הפרקים |
 | תוכן העניינים | `TableOfContents.tsx` | מסמן את הסעיף הנוכחי ואת ההתקדמות |
 | ניווט בין פרקים | `ChapterPager.tsx` | הקודם והבא, וקיצורי מקלדת |

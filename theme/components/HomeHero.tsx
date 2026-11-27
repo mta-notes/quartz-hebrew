@@ -35,14 +35,12 @@ const ART = `
   <text class="a-group" x="528" y="148" direction="rtl" text-anchor="start">צעדים ראשונים</text>
   ${row(168, 80, true, "01")}${row(190, 64, false, "02")}${row(212, 88, false, "03")}
   <text class="a-group" x="528" y="244" direction="rtl" text-anchor="start">כתיבה</text>
-  ${row(264, 72, false, "04")}${row(286, 90, false, "05")}${row(308, 60, false, "06")}
+  ${row(264, 72, false, "01")}${row(286, 90, false, "02")}${row(308, 60, false, "03")}
   <text class="a-group" x="528" y="340" direction="rtl" text-anchor="start">התאמה אישית</text>
-  ${row(360, 76, false, "07")}${row(382, 58, false, "08")}
+  ${row(360, 76, false, "01")}${row(382, 58, false, "02")}
 
   <text class="a-eyebrow" x="372" y="90" direction="rtl" text-anchor="start">צעדים ראשונים</text>
   <text class="a-title" x="372" y="120" direction="rtl" text-anchor="start">ברוכים הבאים</text>
-  <rect class="a-chip" x="304" y="134" width="68" height="18" rx="9"/>
-  <rect class="a-chip" x="200" y="134" width="96" height="18" rx="9"/>
   <rect class="a-text" x="60" y="174" width="312" height="7" rx="3.5"/>
   <rect class="a-text" x="96" y="190" width="276" height="7" rx="3.5"/>
   <rect class="a-text" x="168" y="206" width="204" height="7" rx="3.5"/>
